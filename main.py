@@ -53,7 +53,7 @@ def main():
     remaining = get_remaining_seats(14592)
     if remaining is not None and remaining > 0:
         print(f"Seats available: {remaining}")
-        send_email_notification(remaining)
+        send_email_notification()
     else:
         print("No seats available.")
 
