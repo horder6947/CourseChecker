@@ -50,7 +50,7 @@ def get_remaining_seats(crn):
     raise ValueError("No row with label 'Seats' was found.")
 
 def main():
-    remaining = get_remaining_seats(14592)
+    remaining = get_remaining_seats(15320)
     if remaining is not None and remaining > 0:
         print(f"Seats available: {remaining}")
         send_email_notification()
