@@ -15,7 +15,7 @@ def send_email_notification():
     recipient_email = "kelrefaey00@gmail.com"
 
     subject = "Course Seat Available!"
-    body = f"There are seats available! Check the course page: {URL}"
+    body = f"There are seats available! Check the course page."
 
     message = f"Subject: {subject}\n\n{body}"
 
@@ -59,5 +59,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# print(get_seat_availability(14592))
