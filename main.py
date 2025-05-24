@@ -3,16 +3,14 @@ from bs4 import BeautifulSoup
 import os
 import smtplib
 
-URL = "https://mybanner.qu.edu.qa/PROD/bwckschd.p_disp_detail_sched?term_in=202510&crn_in="  # Replace with the actual URL
-# crn = 14592
-CHECK_INTERVAL = 2  # seconds
+URL = os.environ['URL']  # Replace with the actual URL
 
 def send_email_notification():
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
-    your_email = "aaa75938167@gmail.com"
-    your_password = "vhyletsszokihnlo"  # Use App Password for Gmail
-    recipient_email = "kelrefaey00@gmail.com"
+    your_email = os.environ['SENDER_EMAIL']
+    your_password = os.environ['PASSWORD']  # Use App Password for Gmail
+    recipient_email = os.environ['RECIPIENT_EMAIL']
 
     subject = "Course Seat Available!"
     body = f"There are seats available! Check the course page."
