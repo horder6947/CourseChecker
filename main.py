@@ -7,8 +7,6 @@ URL = "https://mybanner.qu.edu.qa/PROD/bwckschd.p_disp_detail_sched?term_in=2025
 # crn = 14592
 CHECK_INTERVAL = 2  # seconds
 
-import smtplib
-
 def send_email_notification():
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
@@ -51,17 +49,15 @@ def get_remaining_seats(crn):
 
     raise ValueError("No row with label 'Seats' was found.")
 
-while True:
-    try:
-        seats = get_remaining_seats(14592)
-        if seats > 3:
-            send_email_notification()
-            break  # stop after notifying
-        else:
-            print("No seats available, checking again in 2 seconds...")
-    except Exception as e:
-        print(f"Error occurred: {e}")
-    
-    time.sleep(CHECK_INTERVAL)
+def main():
+    remaining = get_remaining_seats()
+    if remaining is not None and remaining > 0:
+        print(f"Seats available: {remaining}")
+        send_email_notification(remaining)
+    else:
+        print("No seats available.")
+
+if __name__ == "__main__":
+    main()
 
 # print(get_seat_availability(14592))
