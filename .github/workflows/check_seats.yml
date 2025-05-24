@@ -1,26 +1,25 @@
-name: Check Course Seats
+name: Run Python Script Every Minute
 
 on:
   schedule:
     - cron: '*/1 * * * *'  # Runs every minute
-  workflow_dispatch:        # Allows manual trigger
+  workflow_dispatch:       # Allows manual triggering
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-
+  run-python:
+    runs-on: ubuntu-latest  # Free GitHub-hosted runner
+    
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
+      - name: Checkout code
+        uses: actions/checkout@v4  # Pulls your repo into the runner
+        
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run seat checker
-        run: python main.py
+          python-version: '3.11'  # Choose your Python version
+          
+      - name: Install dependencies (if any)
+        run: pip install -r requirements.txt  # Only if you have dependencies
+        
+      - name: Run Python script
+        run: main.py  # Replace with your script name
