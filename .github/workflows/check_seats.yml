@@ -1,4 +1,4 @@
-name: Run Python Script Every Minute
+name: check_seats
 
 on:
   schedule:
@@ -22,4 +22,4 @@ jobs:
         run: pip install -r requirements.txt  # Only if you have dependencies
         
       - name: Run Python script
-        run: main.py  # Replace with your script name
+        run: python main.py  # Replace with your script name
