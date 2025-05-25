@@ -10,8 +10,7 @@ URL = os.environ['URL']  # Replace with the actual URL
 
 matrix = [[14369, os.environ['RECIPIENT_EMAIL']],
           [13990, os.environ['RECIPIENT_EMAIL']],
-          [15320, os.environ['RECIPIENT_EMAIL']],
-          [14592, os.environ['RECIPIENT_EMAIL']]]
+          [15320, os.environ['RECIPIENT_EMAIL']]]
 
 def send_email_notification(course_details: str, seats: int, index: int) -> None:
     smtp_server = "smtp.gmail.com"
