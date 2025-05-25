@@ -2,60 +2,94 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import smtplib
+import requests
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 URL = os.environ['URL']  # Replace with the actual URL
 
-def send_email_notification():
+matrix = [[14369, os.environ['RECIPIENT_EMAIL']],
+          [13990, os.environ['RECIPIENT_EMAIL']],
+          [15320, os.environ['RECIPIENT_EMAIL']],
+          [14592, os.environ['RECIPIENT_EMAIL']]]
+
+def send_email_notification(course_details: str, seats: int, index: int) -> None:
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     your_email = os.environ['SENDER_EMAIL']
     your_password = os.environ['PASSWORD']  # Use App Password for Gmail
-    recipient_email = os.environ['RECIPIENT_EMAIL']
 
-    subject = "Course Seat Available!"
-    body = f"There are seats available! Check the course page."
+    subject = f"Seat FOUND for {course_details}"
 
-    message = f"Subject: {subject}\n\n{body}"
+    html_body = f"""
+    <html>
+    <body>
+        <h2 style="color: green;">✅ Seat Available!</h2>
+        <p style="font-size: 18px;">
+            <strong>{course_details}</strong><br><br>
+            <span style="color: blue;">There are available seats for the course above!</span><br><br>
+            <a href="https://ssr.qu.edu.qa/StudentRegistrationSsb/ssb/classRegistration/classRegistration" style="font-size: 18px;">Click here to register</a>
+        </p>
+    </body>
+    </html>
+    """
 
+    # Set up MIME message
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = your_email
+    msg["To"] = matrix[index][1]
+
+    msg.attach(MIMEText(html_body, "html"))
+
+    # Send the email
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
             server.login(your_email, your_password)
-            server.sendmail(your_email, recipient_email, message)
-        print("✅ Email sent successfully.")
+
+            server.sendmail(your_email, matrix[index][1], msg.as_string())
+
+        print("✅ HTML email sent successfully to", matrix[index][1])
     except Exception as e:
         print(f"❌ Failed to send email: {e}")
 
 
-def get_remaining_seats(crn):
-    response = requests.get(URL + str(crn))
-    soup = BeautifulSoup(response.text, 'html.parser')
+def fetch_course_info(crn: int) -> tuple[int, str]:
+    """
+    Returns (remaining_seats, course_details_string)
+    """
+    resp  = requests.get(URL + str(crn), timeout=10)
+    soup  = BeautifulSoup(resp.text, "html.parser")
 
-    table = soup.find('table', {'summary': 'This layout table is used to present the seating numbers.'})
-    if not table:
-        raise ValueError("Couldn't find the course seating table.")
+    # (a) Course details  e.g. "Computer Ethics - 14592 - CMPS 200 - L03"
+    th_tag = soup.find("th", class_="ddlabel", scope="row")
+    course_details = th_tag.get_text(strip=True) if th_tag else f"CRN {crn}"
 
-    for row in table.find_all('tr'):
-        label = row.find('span', string='Seats')
-        if label:
-            cells = row.find_all('td', class_='dddefault')
-            if len(cells) >= 3:
-                remaining = int(cells[2].get_text(strip=True))
-                return remaining
-            else:
-                raise ValueError(f"Expected at least 3 <td> cells, found {len(cells)}.")
+    # (b) Remaining seats
+    table = soup.find("table", summary="This layout table is used to present the seating numbers.")
+    remaining = 0
+    if table:
+        for row in table.find_all("tr"):
+            if row.find("span", string="Seats"):
+                cells = row.find_all("td", class_="dddefault")
+                if len(cells) >= 3:
+                    remaining = int(cells[2].get_text(strip=True))
+                break
 
-    raise ValueError("No row with label 'Seats' was found.")
+    return remaining, course_details
 
-def main():
-    remaining = get_remaining_seats(14592)
-    if remaining is not None and remaining > 0:
-        print(f"Seats available: {remaining}")
-        send_email_notification()
-    else:
-        print("No seats available.")
-
-if __name__ == "__main__":
-    main()
-
-##asdf
+print("Looking for available seats for:")
+for i in range(0, len(matrix)):
+    print(matrix[i][0])
+    
+try:
+    for i in range(0, len(matrix)):
+        remaining, details = fetch_course_info(matrix[i][0])
+        if remaining > 0:
+            print(f"Found {remaining} available seat(s) for {details}")
+            send_email_notification(details, remaining, i)
+        else:
+            print(f"No available seats for {details}")
+except Exception as exc:
+    print(f"⚠️ Error: {exc}")
