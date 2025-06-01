@@ -86,7 +86,7 @@ for i in range(0, len(matrix)):
 try:
     for i in range(0, len(matrix)):
         remaining, details = fetch_course_info(matrix[i][0])
-        if remaining > 0:
+        if remaining > -1:
             print(f"Found {remaining} available seat(s) for {details}")
             send_email_notification(details, remaining, i)
         else:
