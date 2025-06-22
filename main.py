@@ -8,8 +8,7 @@ from email.mime.text import MIMEText
 
 URL = os.environ['URL']  # Replace with the actual URL
 
-matrix = [[15320, os.environ['RECIPIENT_EMAIL']],
-          [12072, os.environ['RECIPIENT_EMAIL']]]
+matrix = [[15320, os.environ['RECIPIENT_EMAIL']]]
 
 def send_email_notification(course_details: str, seats: int, index: int) -> None:
     smtp_server = "smtp.gmail.com"
